@@ -18,7 +18,7 @@ class datastore:
             file.close()
 
             if not self.file_size_check():
-                raise Exception('Size of the data store exceeds 1 GB. Unable to add more data.')
+                print('Size of the data store exceeds 1 GB. Unable to add more data.')
 
             print('The file is created in this location' + self.file_path)
         except:
@@ -42,32 +42,32 @@ class datastore:
     def key_check(self, key):                                                  
         if type(key) == type(""):
             if len(key) > 32:
-                raise Exception('Key size is capped at 32char. The given key length is ' + str(len(key)))
+                print('Key size is capped at 32char. The given key length is ' + str(len(key)))
             else:
                 return True
         else:
-            raise Exception('Key value is not a string. The give type is: ' + str(type(key)))
+            print('Key value is not a string. The give type is: ' + str(type(key)))
     
     #This func is used to create key-value pair.
     def create(self, key='', value='', ttl=None):
         self.key_check(key)
         
         if key == '':
-            raise Exception('No key was provided.')
+            print('No key was provided.')
         
         if value == '':
             value = None
         
         if sys.getsizeof(value) > 16384:                                          
-            raise Exception("value exceeds 16KB size limit.")
+            print("value exceeds 16KB size limit.")
         
         if not self.file_size_check():
-            raise Exception('Size of the data store exceeds 1 GB. Unable to add more data.')
+            print('Size of the data store exceeds 1 GB. Unable to add more data.')
         self.data_lock.acquire()
         
         if key in self.data.keys():
             self.data_lock.release()
-            raise Exception('Key is already present.')
+            print('Key is already present.')
                                             
         if ttl is not None:
             ttl = int(time.time()) + abs(int(ttl))
@@ -85,7 +85,7 @@ class datastore:
 
         self.key_check(key)
         if key == '':
-            raise Exception('Expecting a key to be read.')
+            print('Expecting a key to be read.')
         
         self.data_lock.acquire()
 
@@ -93,7 +93,7 @@ class datastore:
             pass
         else:
             self.data_lock.release()
-            raise Exception('Key not found in database')
+            print('Key not found in database')
 
         ttl = self.data[key]['ttl']
 
@@ -105,14 +105,14 @@ class datastore:
             return json.dumps(self.data[key]['value'])
         else:
             self.data_lock.release()
-            raise Exception("Key's TTL has expired. Unable to read.")
+            print("Key's TTL has expired. Unable to read.")
     
     #This func is used to delete the key-value pair.
     def delete(self, key=''):
         self.key_check(key)
 
         if key == '':
-            raise Exception('Expecting a key to be read.')
+            print('Expecting a key to be read.')
 
         self.data_lock.acquire()
 
@@ -120,7 +120,7 @@ class datastore:
             pass
         else:
             self.data_lock.release()
-            raise Exception('Key not found in database')
+            print('Key not found in database')
 
         ttl = self.data[key]['ttl']
         
@@ -138,4 +138,4 @@ class datastore:
             return
         else:
             self.data_lock.release()
-            raise Exception("Key's TTL has expired. Unable to delete!!")
+            print("Key's TTL has expired. Unable to delete!!")
